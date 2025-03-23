@@ -1,14 +1,24 @@
 import pygame
+import config
 
 
 #Setup:
-pygame.init()
 SCREEN_X = 1200
 SCREEN_Y = 800
 screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
 pygame.display.set_caption("Mayhem")
 running = True
+BACKGROUND_COLOR = (0,0,0)
 clock = pygame.time.Clock()
+
+
+#Filbaner til bildene:
+
+p1_img = "p1.png"
+p2_img = "p2.png"
+
+
+
 
 
 #Spiller bevegelse:
