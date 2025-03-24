@@ -61,7 +61,6 @@ OBSTACLE_COLOR = (128, 128, 128)
 
 
 
-
 #Kontroller
 #Spiller 1
 P1_LEFT = pygame.K_a
