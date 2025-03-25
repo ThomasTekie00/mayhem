@@ -37,11 +37,16 @@ background_color = background.get_at((SCREEN_X // 2, 1000))
 skip1 = pygame.image.load(p1_img).convert_alpha()
 skip1 = pygame.transform.scale(skip1, (60,50))
 skip1 = pygame.transform.flip(skip1, True, False)
+skip1_rect = skip1.get_rect(center = (500,700))
+skip1_speed = 5
+
 
 #Skip 2
 skip2 = pygame.image.load(p2_img).convert_alpha()
 skip2 = pygame.transform.scale(skip2, (60,50))
 skip2 = pygame.transform.flip(skip2, True, False)
+skip2_rect = skip2.get_rect(center = (500,700))
+skip2_speed = 5
 
 
 #Meteor 1
@@ -61,10 +66,51 @@ while run:
             run = False
 
 
+    
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_a]:
+        skip2_rect.x -= skip2_speed
+    if keys[pygame.K_d]:
+        skip2_rect.x += skip2_speed
+    if keys[pygame.K_w]:
+        skip2_rect.y -= skip2_speed
+    if keys[pygame.K_s]:
+        skip2_rect.y += skip2_speed
+    
+    if skip2_rect.left < 0:
+        skip2_rect.left = 0
+    if skip2_rect.right > SCREEN_X:
+        skip2_rect.right = SCREEN_X
+    if skip2_rect.top < 0:
+        skip2_rect.top = 0
+    if skip2_rect.bottom > SCREEN_Y:
+        skip2_rect.bottom = SCREEN_Y
+    
+    
+    if keys[pygame.K_LEFT]:
+        skip1_rect.x -= skip1_speed
+    if keys[pygame.K_RIGHT]:
+        skip1_rect.x += skip1_speed
+    if keys[pygame.K_UP]:
+        skip1_rect.y -= skip1_speed
+    if keys[pygame.K_DOWN]:
+        skip1_rect.y += skip1_speed
+    
+    if skip1_rect.left < 0:
+        skip1_rect.left = 0
+    if skip1_rect.right > SCREEN_X:
+        skip1_rect.right = SCREEN_X
+    if skip1_rect.top < 0:
+        skip1_rect.top = 0
+    if skip1_rect.bottom > SCREEN_Y:
+        skip1_rect.bottom = SCREEN_Y
+
+
     screen.blit(background, (0,0))
     #pygame.draw.rect(screen, background_color , (0,1000, SCREEN_X, SCREEN_Y / 2))
-    screen.blit(skip1, (500,500))
-    screen.blit(skip2, (700, 500))
+    screen.blit(skip1, skip1_rect)
+    screen.blit(skip2, skip2_rect)
     screen.blit(stein, (350, stein_y_pos))
     stein_y_pos += 4
     if stein_y_pos < -1100:
