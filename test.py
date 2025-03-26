@@ -6,6 +6,7 @@ pygame.init()
 run = True
 SCREEN_X = 1920
 SCREEN_Y = 1080
+vector = pygame.math.Vector2
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
 pygame.display.set_caption("Mayhem")
@@ -37,16 +38,110 @@ background_color = background.get_at((SCREEN_X // 2, 1000))
 skip1 = pygame.image.load(p1_img).convert_alpha()
 skip1 = pygame.transform.scale(skip1, (60,50))
 skip1 = pygame.transform.flip(skip1, True, False)
-skip1_rect = skip1.get_rect(center = (500,700))
-skip1_speed = 5
+#skip1_rect = skip1.get_rect(center = (500,700))
+#skip1_speed = 5
 
 
 #Skip 2
-skip2 = pygame.image.load(p2_img).convert_alpha()
-skip2 = pygame.transform.scale(skip2, (60,50))
-skip2 = pygame.transform.flip(skip2, True, False)
-skip2_rect = skip2.get_rect(center = (500,700))
-skip2_speed = 5
+#skip2 = pygame.image.load(p2_img).convert_alpha()
+#skip2 = pygame.transform.scale(skip2, (60,50))
+#skip2 = pygame.transform.flip(skip2, True, False)
+#skip2_rect = skip2.get_rect(center = (500,700))
+#skip2_speed = 5
+
+
+
+
+    
+
+class Starship(pygame.sprite.Sprite):
+    def __init__(self, image, pos, vel):
+        super().__init__()
+        self.original_image = image
+        self.image = image
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = vector(pos)
+        self.vel = vector(vel)
+        self.direction = vector(0,-3)
+        self.speed = 8
+        self.angle = 0
+        self.angle_speed = 0
+        self.thrust = 0.8
+        self.max_speed = 8
+
+        self.current_health = 200
+        self.maximum_health = 1000
+        self.health_bar_length = 400
+        self.health_ratio = self.maximum_health / self.health_bar_length
+
+##### HEALTH #######################################################################################################
+    def get_damage(self, amount):
+        if self.current_health > 0:
+            self.current_health -= amount
+        if self.current_health < 0:
+            self.current_health = 0
+
+    def get_health(self, amount):
+        if self.current_health < self.maximum_health:
+            self.current_health += amount
+        if self.current_health >= self.maximum_health:
+            self.current_health = self.maximum_health
+        
+    def basic_health(self, surface):
+        pygame.draw.rect(screen, "red", (10,10, self.current_health/self.health_ratio, 25))
+        pygame.draw.rect(screen, "white", (10, 10, self.health_bar_length, 25), 5)  
+
+
+    def acc(self):
+        self.vel += self.direction * self.thrust
+
+
+
+    def update(self):
+
+        #PURE MOVEMENT AND SCREEN WRAPPIGN
+
+       key = pygame.key.get_pressed()
+
+       self.angle_speed = 0
+
+       if key[pygame.K_RIGHT]:
+           self.angle_speed += -5
+       if key[pygame.K_LEFT]:
+           self.angle_speed += 5
+       if key[pygame.K_UP]:
+           self.acc()
+       if key[pygame.K_DOWN]:
+           self.vel *= 0.95
+
+       self.angle += self.angle_speed
+       self.direction = vector(0, -1). rotate(-self.angle)
+
+       self.vel *= 0.85
+
+       self.vel += vector(0,0.2)
+
+       self.pos += self.vel
+
+
+       self.image = pygame.transform.rotate(self.original_image, self.angle)
+
+       self.rect = self.image.get_rect(center = self.pos) 
+
+
+       if self.pos.x < 0:
+        self.pos.x = SCREEN_X
+       elif self.pos.x > SCREEN_X:
+        self.pos.x = 0
+       if self.pos.y < 0:
+        self.pos.y = SCREEN_Y
+       elif self.pos.y > SCREEN_Y:
+        self.pos.y = 0 
+
+
+
+
+
 
 
 #Meteor 1
@@ -60,61 +155,39 @@ stein_2 = pygame.transform.scale(stein_2, (200,200))
 
 
 
+
+ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
+
+all_sprites = pygame.sprite.Group()
+all_sprites.add(ship)
+
+
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+#################################################################
+##Delete: TEST
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                ship.get_health(200)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                ship.get_damage(200)
+#################################################################       
 
 
+    all_sprites.update()
     
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_a]:
-        skip2_rect.x -= skip2_speed
-    if keys[pygame.K_d]:
-        skip2_rect.x += skip2_speed
-    if keys[pygame.K_w]:
-        skip2_rect.y -= skip2_speed
-    if keys[pygame.K_s]:
-        skip2_rect.y += skip2_speed
-    
-    if skip2_rect.left < 0:
-        skip2_rect.left = 0
-    if skip2_rect.right > SCREEN_X:
-        skip2_rect.right = SCREEN_X
-    if skip2_rect.top < 0:
-        skip2_rect.top = 0
-    if skip2_rect.bottom > SCREEN_Y:
-        skip2_rect.bottom = SCREEN_Y
-    
-    
-    if keys[pygame.K_LEFT]:
-        skip1_rect.x -= skip1_speed
-    if keys[pygame.K_RIGHT]:
-        skip1_rect.x += skip1_speed
-    if keys[pygame.K_UP]:
-        skip1_rect.y -= skip1_speed
-    if keys[pygame.K_DOWN]:
-        skip1_rect.y += skip1_speed
-    
-    if skip1_rect.left < 0:
-        skip1_rect.left = 0
-    if skip1_rect.right > SCREEN_X:
-        skip1_rect.right = SCREEN_X
-    if skip1_rect.top < 0:
-        skip1_rect.top = 0
-    if skip1_rect.bottom > SCREEN_Y:
-        skip1_rect.bottom = SCREEN_Y
-
-
     screen.blit(background, (0,0))
-    #pygame.draw.rect(screen, background_color , (0,1000, SCREEN_X, SCREEN_Y / 2))
-    screen.blit(skip1, skip1_rect)
-    screen.blit(skip2, skip2_rect)
+    all_sprites.draw(screen)
+    ship.basic_health(screen)
+    
     screen.blit(stein, (350, stein_y_pos))
     stein_y_pos += 4
-    if stein_y_pos < -1100:
-        stein_y_pos = -10
+    if stein_y_pos > SCREEN_Y:
+        stein_y_pos = -100
     screen.blit(stein_2, (100, 500))
     screen.blit(text_surface, (800, 100))
 
