@@ -2,31 +2,22 @@ import pygame
 import config
 
 
-#Setup:
-SCREEN_X = 1920
-SCREEN_Y = 1080
 
 
-#Phyics
-GRAVITY = 0.2
-THRUST_POWER = 0.5
-ROTATION_SPEED = 3
-FRICTION = 1
+#Screen Setup
+SCREEN_X = 1000
+SCREEN_Y = 600
+FPS = 60
 
 
-#Spaceship setup
-START_FUEL = 1000
-FUEL_CONSUMPTION = 0.5
-MAX_SPEED = 10
+#Filpaths
+bk_img = "bilder/space.png"
+p1_img = "bilder/p1.png"
+p2_img = "bilder/p2.png"
+rock1_img = "bilder/meteor1.png"
+rock2_img = "bilder/meteor2.png"
+font_img = "bilder/font.otf"
 
 
-#WEAPON
-BULLET_SPEED = 5
-BULLET_SIZE = 5
-FIRE_RATE = 10
-
-
-#Game settings
-STARTING_LIVES = 3
 
 
