@@ -4,8 +4,8 @@ import random
 
 pygame.init()
 run = True
-SCREEN_X = 1920
-SCREEN_Y = 1080
+SCREEN_X = 1000
+SCREEN_Y = 600
 vector = pygame.math.Vector2
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
@@ -31,12 +31,12 @@ background = pygame.image.load(bk_img)
 background = pygame.transform.scale(background,(SCREEN_X, SCREEN_Y))
 background = background.convert()
 #Får fargen til bunnen av skjermen slik at jeg kan bruke det som en platform
-background_color = background.get_at((SCREEN_X // 2, 1000))
+
 
 
 #Skip 1
 skip1 = pygame.image.load(p1_img).convert_alpha()
-skip1 = pygame.transform.scale(skip1, (60,50))
+skip1 = pygame.transform.scale(skip1, (30,25))
 skip1 = pygame.transform.flip(skip1, True, False)
 #skip1_rect = skip1.get_rect(center = (500,700))
 #skip1_speed = 5
@@ -62,7 +62,7 @@ class Starship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.pos = vector(pos)
         self.vel = vector(vel)
-        self.direction = vector(0,-3)
+        self.direction = vector(0,-1)
         self.speed = 8
         self.angle = 0
         self.angle_speed = 0
@@ -119,7 +119,7 @@ class Starship(pygame.sprite.Sprite):
 
        self.vel *= 0.85
 
-       self.vel += vector(0,0.2)
+       self.vel += vector(0,0.1)
 
        self.pos += self.vel
 
@@ -129,7 +129,9 @@ class Starship(pygame.sprite.Sprite):
        self.rect = self.image.get_rect(center = self.pos) 
 
 
-       if self.pos.x < 0:
+        
+
+       if self.rect.x < 0:
         self.pos.x = SCREEN_X
        elif self.pos.x > SCREEN_X:
         self.pos.x = 0
@@ -140,13 +142,33 @@ class Starship(pygame.sprite.Sprite):
 
 
 
+class RockShower(pygame.sprite.Sprite):
+    def __init__(self, image, pos, vel):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.pos = vector(pos)
+        self.vel = vector(vel)
+    
+    def update(self):
+        self.pos += self.vel
+        self.rect.center = self.pos
 
+        if self.rect.left > SCREEN_X:
+            self.pos.x = -self.rect.width/2
+        elif self.rect.right < 0:
+            self.pos.x = SCREEN_X + self.rect.width/2
+            
+        if self.rect.top > SCREEN_Y:
+            self.pos.y = -self.rect.height/2
+        elif self.rect.bottom < 0:
+            self.pos.y = SCREEN_Y + self.rect.height/2
 
 
 
 #Meteor 1
 stein = pygame.image.load(rock_img)
-stein = pygame.transform.scale(stein, (200,200))
+stein = pygame.transform.scale(stein, (80,80))
 stein_y_pos = 0
 
 #Meteor 2
@@ -157,9 +179,23 @@ stein_2 = pygame.transform.scale(stein_2, (200,200))
 
 
 ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
+rockshower_group = pygame.sprite.Group()
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(ship)
+
+for i in range(15):
+    x_pos = random.randint(100, 900)
+    y_pos = random.randint(100, 500)
+
+    x_speed = random.uniform(-0.7, 0.7)
+    y_speed = random.uniform(-0.7, 0.7)
+
+    rock1 = RockShower(stein, (x_pos, y_pos), (x_speed, y_speed))
+    all_sprites.add(rock1)
+
+
+
 
 
 
@@ -184,11 +220,7 @@ while run:
     all_sprites.draw(screen)
     ship.basic_health(screen)
     
-    screen.blit(stein, (350, stein_y_pos))
-    stein_y_pos += 4
-    if stein_y_pos > SCREEN_Y:
-        stein_y_pos = -100
-    screen.blit(stein_2, (100, 500))
+
     screen.blit(text_surface, (800, 100))
 
     pygame.display.flip()
