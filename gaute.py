@@ -128,7 +128,7 @@ while run:
 
     keys = pygame.key.get_pressed()
 
-    # Player 1 (WASD + SPACE)
+    # Player 1 
     if keys[pygame.K_a]:
         player1.rotate(5)
     if keys[pygame.K_d]:
@@ -136,7 +136,7 @@ while run:
     if keys[pygame.K_w]:
         player1.apply_thrust()
 
-    # Player 2 (Arrows + Right Shift)
+    # Player 2 
     if keys[pygame.K_LEFT]:
         player2.rotate(5)
     if keys[pygame.K_RIGHT]:
