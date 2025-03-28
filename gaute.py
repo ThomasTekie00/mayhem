@@ -77,6 +77,21 @@ class Ship:
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
+    def fire(self) :
+        rad = math.radians(self.angle)
+        bullet_speed = 10
+        velocity = pygame.math.Vector2(math.cos(rad), -math.sin(rad)) * bullet_speed
+        bullet_pos = pygame.math.Vector2(self.rect.center)
+        return {
+            "pos": bullet_pos,
+            "vel": velocity,
+            "radius": 5,
+            "color": (255, 255, 0)
+        } 
+        # Dette fungerer fortsatt ikke i en egen class. Er nesten bedre å srkive en egen class for fire tror jeg.
+        # Dette fungerer hvis man skriver egne funksjoner i hovedløkken. Så det er ganske klønete.
+        # Vet enda ikke helt hvordan jeg skal få fikset det.  
+
 # Skip-instansene
 player1 = Ship(p1_img, (400, 700))
 player2 = Ship(p2_img, (1500, 700))
