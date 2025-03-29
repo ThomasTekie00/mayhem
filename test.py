@@ -25,6 +25,7 @@ p1_img = "bilder/p1.png"
 p2_img = "bilder/p2.png"
 rock_img = "bilder/meteor1.png"
 rock2_img = "bilder/meteor2.png"
+land_img = "bilder/landing.png"
 
 #Bakgrunnen
 background = pygame.image.load(bk_img)
@@ -71,8 +72,15 @@ class Starship(pygame.sprite.Sprite):
 
         self.current_health = 200
         self.maximum_health = 1000
-        self.health_bar_length = 400
+        self.health_bar_length = 200
         self.health_ratio = self.maximum_health / self.health_bar_length
+
+        self.current_fuel = 100
+        self.maximum_fuel = 1000
+        self.fuel_bar_length = 200
+        self.fuel_ratio = self.maximum_fuel / self.fuel_bar_length
+
+        self.is_landed = False
 
 ##### HEALTH #######################################################################################################
     def get_damage(self, amount):
@@ -91,13 +99,38 @@ class Starship(pygame.sprite.Sprite):
         pygame.draw.rect(screen, "red", (10,10, self.current_health/self.health_ratio, 25))
         pygame.draw.rect(screen, "white", (10, 10, self.health_bar_length, 25), 5)  
 
+    def basic_fuel(self, amount):
+        pygame.draw.rect(screen, "Green", (10,50, self.current_fuel / self.fuel_ratio, 25 ))
+        pygame.draw.rect(screen, "white", (10, 50, self.health_bar_length, 25), 5) 
+
+    def get_fuel(self, amount):
+        if self.current_fuel < self.maximum_fuel:
+            self.current_fuel += amount
+        if self.current_fuel >= self.maximum_fuel:
+            self.current_fuel = self.maximum_fuel
+
+
 
     def acc(self):
         self.vel += self.direction * self.thrust
 
 
+    def check_landing(self, landing_pad):
+        if self.rect.colliderect(landing_pad.rect):
+            self.vel = vector(0,0)
+            self.angle_speed = 0
+            self.pos.y = landing_pad.rect.top - self.rect.height/2
+            return True
+        return False
+
 
     def update(self):
+       if self.is_landed:
+           key = pygame.key.get_pressed()
+           if key[pygame.K_UP] and self.current_fuel > 0:
+               self.is_landed = False
+               self.acc()
+           return
 
         #PURE MOVEMENT AND SCREEN WRAPPIGN
 
@@ -143,27 +176,63 @@ class Starship(pygame.sprite.Sprite):
 
 
 class RockShower(pygame.sprite.Sprite):
-    def __init__(self, image, pos, vel):
+    def __init__(self, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        
+        #Tilfeldig X start
+        start_x = random.randint(100,900)
+        start_y = random.randint(-300, -50)
+
+        self.pos = vector(start_x, start_y)
+
+        #Randomfart
+        speed_x = random.uniform(-0.8, 0.8)
+        speed_y = random.uniform(1,4)
+
+        self.vel = vector(speed_x, speed_y)
+        self.rect.center = self.pos
+
+    def update(self):
+        #Bevegelse
+        self.pos += self.vel
+        self.rect.center = self.pos
+
+        #Fra bunnen tilbake til toppen, random høyde og start
+        if self.rect.top > 600:
+            self.pos.x = random.randint(100, 900)
+            self.pos.y = random.randint(-200, -50)
+
+            #Tilfeldig fart også
+            self.vel.x = random.uniform(-0.8, 0.8)
+            self.vel.y = random.uniform(1, 4)
+
+
+
+class Landing(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect()
         self.pos = vector(pos)
-        self.vel = vector(vel)
-    
-    def update(self):
-        self.pos += self.vel
         self.rect.center = self.pos
 
-        if self.rect.left > SCREEN_X:
-            self.pos.x = -self.rect.width/2
-        elif self.rect.right < 0:
-            self.pos.x = SCREEN_X + self.rect.width/2
-            
-        if self.rect.top > SCREEN_Y:
-            self.pos.y = -self.rect.height/2
-        elif self.rect.bottom < 0:
-            self.pos.y = SCREEN_Y + self.rect.height/2
+    def update(self):
+        self.rect.center = self.pos
 
+
+
+
+
+
+
+
+
+
+#Landing
+land = pygame.image.load(land_img)
+land = pygame.transform.scale(land, (150,30))
 
 
 #Meteor 1
@@ -178,25 +247,25 @@ stein_2 = pygame.transform.scale(stein_2, (200,200))
 
 
 
-ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
+
 rockshower_group = pygame.sprite.Group()
 
 all_sprites = pygame.sprite.Group()
+
+
+for i in range(4):
+    rock = RockShower(stein)
+    all_sprites.add(rock)
+    rockshower_group.add(rock)
+
+landing_pad = Landing(land, (150, 450))
+all_sprites.add(landing_pad)
+landing_group = pygame.sprite.Group()
+landing_group.add(landing_pad)
+
+ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
+
 all_sprites.add(ship)
-
-for i in range(15):
-    x_pos = random.randint(100, 900)
-    y_pos = random.randint(100, 500)
-
-    x_speed = random.uniform(-0.7, 0.7)
-    y_speed = random.uniform(-0.7, 0.7)
-
-    rock1 = RockShower(stein, (x_pos, y_pos), (x_speed, y_speed))
-    all_sprites.add(rock1)
-
-
-
-
 
 
 while run:
@@ -215,12 +284,19 @@ while run:
 
 
     all_sprites.update()
+
+    landing_collisions = pygame.sprite.spritecollide(ship, landing_group, False)
+    if landing_collisions:
+        print("Ok skjedde")
+    
     
     screen.blit(background, (0,0))
     all_sprites.draw(screen)
     ship.basic_health(screen)
+    ship.basic_fuel(screen)
     
-
+    pygame.draw.rect(screen, (255, 0, 0), ship.rect, 1)  # Draw ship's hitbox in red
+    pygame.draw.rect(screen, (0, 255, 0), landing_pad.rect, 1)
     screen.blit(text_surface, (800, 100))
 
     pygame.display.flip()
