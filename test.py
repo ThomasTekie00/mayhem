@@ -67,12 +67,12 @@ class Starship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.pos = vector(pos)
         self.vel = vector(vel)
-        self.direction = vector(0,-1)
+        self.direction = vector(0,0)
         self.speed = 8
         self.angle = 0
-        self.angle_speed = 0
+        #self.angle_speed = 100
         self.thrust = 0.8
-        self.max_speed = 8
+        
 
         self.current_health = 200
         self.maximum_health = 1000
@@ -126,7 +126,6 @@ class Starship(pygame.sprite.Sprite):
         self.vel += self.direction * self.thrust
 
 
-
     def update(self):
        
         #PURE MOVEMENT AND SCREEN WRAPPIGN
@@ -148,7 +147,7 @@ class Starship(pygame.sprite.Sprite):
        #Oppdatere vinkel på hvor nesen peker basert på rotatsjonshastighet 
        self.angle += self.angle_speed
        #Oppdatering retningsvektoren basert på ny vinkel
-       self.direction = vector(0, -1). rotate(-self.angle)
+       self.direction = vector(0, -1). rotate(self.angle)
 
        #Fartdemper 
        self.vel *= 0.85
@@ -283,7 +282,7 @@ for i in range(4):
     rockshower_group.add(rock)
 
 
-ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
+ship = Starship(skip1, (random.randint(100, SCREEN_X - 100), random.randint(100, SCREEN_Y - 100)), (0,0))
 
 all_sprites.add(ship)
 
@@ -335,7 +334,7 @@ while run:
     
     #pygame.draw.rect(screen, (255, 0, 0), ship.rect, 1)
     
-    screen.blit(text_surface, (800, 100))
+    screen.blit(text_surface, (350, 100))
 
     pygame.display.flip()
     clock.tick(60)

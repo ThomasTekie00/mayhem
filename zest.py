@@ -65,11 +65,9 @@ class Starship(pygame.sprite.Sprite):
         self.pos = vector(pos)
         self.vel = vector(vel)
         self.direction = vector(0,-1)
-        self.speed = 8
         self.angle = 0
         self.angle_speed = 0
         self.thrust = 0.8
-        self.max_speed = 8
 
         self.current_health = 200
         self.maximum_health = 1000
@@ -81,7 +79,7 @@ class Starship(pygame.sprite.Sprite):
         self.fuel_bar_length = 200
         self.fuel_ratio = self.maximum_fuel / self.fuel_bar_length
 
-        self.is_landed = False
+     
 
 ##### HEALTH #######################################################################################################
     def get_damage(self, amount):
@@ -133,36 +131,35 @@ class Starship(pygame.sprite.Sprite):
         if key[pygame.K_LEFT]:
             self.angle += 5  # Roter mot klokken
         
-        # Hold vinkelen mellom 0-360 grader
-        self.angle %= 360
-        
-        # Oppdater retning basert på vinkel (kun når det trengs)
-        #Alltid ta minus vinkelen man traveler
-        self.direction.x = -math.sin(math.radians(self.angle))
-        self.direction.y = -math.cos(math.radians(self.angle))
-        
+  
         # Akselerasjon
         if key[pygame.K_UP] and self.current_fuel > 0:
             self.acc()
             self.lose_fuel(2)
         
-        # Dempning
+     
+        self.Flyzone()
+        self.space_update()
+        self.Turns()
+        self.update_image()
+
+    def space_update(self):
+        #Dempning
         self.vel *= 0.85
-        
+
+        #Konstant nedtrekk på y aksen
+        self.vel += vector(0,0.1)
+
         # Oppdater posisjon
         self.pos += self.vel
-        
+
+
+    def update_image(self):
         # Oppdater bilde og hitbox
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(center=self.pos)
-        
-        self.Flyzone()
-        self.gravity()
 
-    
-    def gravity(self):
-        #Konstant nedtrekk på y aksen
-        self.vel += vector(0,0.1)
+
 
 
     def Flyzone(self):
@@ -176,7 +173,15 @@ class Starship(pygame.sprite.Sprite):
         elif self.pos.y > SCREEN_Y:
             self.pos.y = 0
 
-
+    def Turns(self):
+        #Hold vinkelen mellom 0-360 grader
+        self.angle %= 360
+        
+        #Oppdater retning basert på vinkel (kun når det trengs)
+        #Alltid ta minus vinkelen man traveler
+        self.direction.x = -math.sin(math.radians(self.angle))
+        self.direction.y = -math.cos(math.radians(self.angle))
+        
 
 
 class RockShower(pygame.sprite.Sprite):
