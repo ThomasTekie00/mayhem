@@ -14,6 +14,7 @@ class PickUps(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.center = self.pos
+
     #Spawn test
     def respawn(self, SCREEN_X, SCREEN_Y):
         new_pos = (random.randint(100, SCREEN_X - 100), random.randint(100, SCREEN_Y - 100))
@@ -27,6 +28,10 @@ class Fuel(PickUps):
     def __init__(self, image, pos, fuel_amount = 200):
         super().__init__()
         self.fuel_amount = fuel_amount
+    
+    def picked(self, ship):
+        ship.get_fuel(self.fuel_amount)
+        return True
 
 
 
@@ -34,6 +39,11 @@ class Health(PickUps):
     def __init__(self, image, pos, health_amount = 100):
         super().__init__()
         self.health_amount = health_amount
+    
+    def picked(self, ship):
+        ship.get_health(self.health_amount)
+        return True
+
 
 
 class RockShower(pygame.sprite.Sprite):

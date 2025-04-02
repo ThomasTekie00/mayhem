@@ -4,10 +4,12 @@ import config
 
 
 
+
 #Screen Setup
 SCREEN_X = 1000
 SCREEN_Y = 600
 FPS = 60
+vector = pygame.math.Vector2
 
 
 #Filpaths
