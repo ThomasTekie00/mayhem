@@ -14,7 +14,7 @@ class PickUps(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.center = self.pos
-    #Spawn
+    #Spawn test
     def respawn(self, SCREEN_X, SCREEN_Y):
         new_pos = (random.randint(100, SCREEN_X - 100), random.randint(100, SCREEN_Y - 100))
         self.pos = new_pos
