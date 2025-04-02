@@ -17,7 +17,11 @@ class PickUps(pygame.sprite.Sprite):
     def update(self):
         self.rect.center = self.pos
 
-    def picked(self):
+    def picked(self, ship):
+        pass
+
+    #Delay med en random spawn
+    def respawn(self):
         pass
 
 
@@ -45,8 +49,16 @@ class Fuel(PickUps):
         pass
 
 class RockShower(pygame.sprite.Sprite):
+    pass
     
 
 
+class Bullet(pygame.sprite.Sprite)
+    def __init__(self):
+        pass
 
+    #Movement
+    #Killself
+    #Fart
+    #
 
