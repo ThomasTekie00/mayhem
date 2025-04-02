@@ -75,7 +75,7 @@ class Starship(pygame.sprite.Sprite):
         self.health_bar_length = 200
         self.health_ratio = self.maximum_health / self.health_bar_length
 
-        self.current_fuel = 100
+        self.current_fuel = 1000
         self.maximum_fuel = 1000
         self.fuel_bar_length = 200
         self.fuel_ratio = self.maximum_fuel / self.fuel_bar_length
@@ -109,34 +109,29 @@ class Starship(pygame.sprite.Sprite):
         if self.current_fuel >= self.maximum_fuel:
             self.current_fuel = self.maximum_fuel
 
+    def lose_fuel(self, amount):
+        if self.current_fuel > 0:
+            self.current_fuel -= amount
+        if self.current_fuel < 0:
+            self.current_fuel = 0
+
+
 
 
     def acc(self):
         self.vel += self.direction * self.thrust
 
 
-    def check_landing(self, landing_pad):
-        if self.rect.colliderect(landing_pad.rect):
-            self.vel = vector(0,0)
-            self.angle_speed = 0
-            self.pos.y = landing_pad.rect.top - self.rect.height/2
-            return True
-        return False
-
 
     def update(self):
-       if self.is_landed:
-           key = pygame.key.get_pressed()
-           if key[pygame.K_UP] and self.current_fuel > 0:
-               self.is_landed = False
-               self.acc()
-           return
-
+       
         #PURE MOVEMENT AND SCREEN WRAPPIGN
-
+       #Sjekker hvilken taster som er trykket 
        key = pygame.key.get_pressed()
 
+       #Nullstilling 
        self.angle_speed = 0
+
 
        if key[pygame.K_RIGHT]:
            self.angle_speed += -5
@@ -144,34 +139,45 @@ class Starship(pygame.sprite.Sprite):
            self.angle_speed += 5
        if key[pygame.K_UP]:
            self.acc()
-       if key[pygame.K_DOWN]:
-           self.vel *= 0.95
+           self.lose_fuel(2)
 
+       #Oppdatere vinkel på hvor nesen peker basert på rotatsjonshastighet 
        self.angle += self.angle_speed
+       #Oppdatering retningsvektoren basert på ny vinkel
        self.direction = vector(0, -1). rotate(-self.angle)
 
+       #Fartdemper 
        self.vel *= 0.85
 
-       self.vel += vector(0,0.1)
-
+       
+       #Posisjon oppdatering med fart 
        self.pos += self.vel
 
-
+       #Bilde rotatsjon 
        self.image = pygame.transform.rotate(self.original_image, self.angle)
 
        self.rect = self.image.get_rect(center = self.pos) 
 
+       self.Flyzone()
+       self.gravity()
 
-        
+    
+    def gravity(self):
+        #Konstant nedtrekk på y aksen
+        self.vel += vector(0,0.1)
 
-       if self.rect.x < 0:
-        self.pos.x = SCREEN_X
-       elif self.pos.x > SCREEN_X:
-        self.pos.x = 0
-       if self.pos.y < 0:
-        self.pos.y = SCREEN_Y
-       elif self.pos.y > SCREEN_Y:
-        self.pos.y = 0 
+
+    def Flyzone(self):
+        #Skipet går ut på venstre, kommer inn på høyre side(Siden x,y aksen starter på top venstre)
+        if self.pos.x < 0:
+            self.pos.x = SCREEN_X
+        elif self.pos.x > SCREEN_X:
+            self.pos.x = 0
+        if self.pos.y < 0:
+            self.pos.y = SCREEN_Y
+        elif self.pos.y > SCREEN_Y:
+            self.pos.y = 0
+
 
 
 
