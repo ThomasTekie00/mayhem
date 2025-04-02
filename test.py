@@ -25,7 +25,8 @@ p1_img = "bilder/p1.png"
 p2_img = "bilder/p2.png"
 rock_img = "bilder/meteor1.png"
 rock2_img = "bilder/meteor2.png"
-land_img = "bilder/landing.png"
+fuel_img = "bilder/fuel.png"
+health_img = "bilder/health.png"
 
 #Bakgrunnen
 background = pygame.image.load(bk_img)
@@ -33,7 +34,10 @@ background = pygame.transform.scale(background,(SCREEN_X, SCREEN_Y))
 background = background.convert()
 #Får fargen til bunnen av skjermen slik at jeg kan bruke det som en platform
 
-
+#Health
+fuel_can = pygame.image.load(fuel_img)
+fuel_can = pygame.transform.scale(fuel_can, (40,40))
+#fuel_can = 
 
 #Skip 1
 skip1 = pygame.image.load(p1_img).convert_alpha()
@@ -99,7 +103,7 @@ class Starship(pygame.sprite.Sprite):
         pygame.draw.rect(screen, "red", (10,10, self.current_health/self.health_ratio, 25))
         pygame.draw.rect(screen, "white", (10, 10, self.health_bar_length, 25), 5)  
 
-    def basic_fuel(self, amount):
+    def basic_fuel(self):
         pygame.draw.rect(screen, "Green", (10,50, self.current_fuel / self.fuel_ratio, 25 ))
         pygame.draw.rect(screen, "white", (10, 50, self.health_bar_length, 25), 5) 
 
@@ -179,6 +183,26 @@ class Starship(pygame.sprite.Sprite):
             self.pos.y = 0
 
 
+class Fuel(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = vector(pos)
+    def update(self):
+        self.rect.center = self.pos
+    
+
+class Health(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
+        super().__init__()
+        self.image = pygame.image.load(image).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30,30))
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = vector(pos)
+
+    
+
 
 
 class RockShower(pygame.sprite.Sprite):
@@ -216,29 +240,9 @@ class RockShower(pygame.sprite.Sprite):
 
 
 
-class Landing(pygame.sprite.Sprite):
-    def __init__(self, image, pos):
-        super().__init__()
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.pos = vector(pos)
-        self.rect.center = self.pos
-
-    def update(self):
-        self.rect.center = self.pos
 
 
 
-
-
-
-
-
-
-
-#Landing
-land = pygame.image.load(land_img)
-land = pygame.transform.scale(land, (150,30))
 
 
 #Meteor 1
@@ -254,9 +258,23 @@ stein_2 = pygame.transform.scale(stein_2, (200,200))
 
 
 
+
+
 rockshower_group = pygame.sprite.Group()
 
 all_sprites = pygame.sprite.Group()
+
+health_group = pygame.sprite.Group()
+health_pos = ((random.randint(200, SCREEN_X - 50), random.randint(200, SCREEN_Y - 50)))
+health_ob = Health(health_img, health_pos)
+health_group.add(health_ob)
+all_sprites.add(health_ob)
+
+fuel_group = pygame.sprite.Group()
+fuel_pos = (random.randint(200, SCREEN_X - 200), random.randint(200, SCREEN_Y - 200))
+fuel_ob = Fuel(fuel_can, fuel_pos)
+fuel_group.add(fuel_ob)
+all_sprites.add(fuel_ob)
 
 
 for i in range(4):
@@ -264,10 +282,6 @@ for i in range(4):
     all_sprites.add(rock)
     rockshower_group.add(rock)
 
-landing_pad = Landing(land, (150, 450))
-all_sprites.add(landing_pad)
-landing_group = pygame.sprite.Group()
-landing_group.add(landing_pad)
 
 ship = Starship(skip1, (SCREEN_X // 2, SCREEN_Y), (0,0))
 
@@ -287,22 +301,40 @@ while run:
             if event.key == pygame.K_DOWN:
                 ship.get_damage(200)
 #################################################################       
+    fuel_check = pygame.sprite.spritecollide(ship, fuel_group, True)
+    if fuel_check:
+        ship.get_fuel(500)
+
+        new_fuel_pos = (random.randint(100, SCREEN_X - 100), random.randint(100, SCREEN_Y - 100))
+        new_fuel = Fuel(fuel_can, new_fuel_pos)
+        fuel_group.add(new_fuel)
+        all_sprites.add(new_fuel)
+    
+    health_check = pygame.sprite.spritecollide(ship, health_group, True)
+    if health_check:
+        ship.get_health(500)
+
+        new_health_pos = (random.randint(100, SCREEN_X - 100), random.randint(100, SCREEN_Y - 100))
+        new_health = Health(health_img, new_health_pos)
+        health_group.add(new_health)
+        all_sprites.add(new_health)
+
+
 
 
     all_sprites.update()
 
-    landing_collisions = pygame.sprite.spritecollide(ship, landing_group, False)
-    if landing_collisions:
-        print("Ok skjedde")
     
     
     screen.blit(background, (0,0))
     all_sprites.draw(screen)
     ship.basic_health(screen)
-    ship.basic_fuel(screen)
+    ship.basic_fuel()
+    fuel_group.draw(screen)
+    health_group.draw(screen)
     
-    pygame.draw.rect(screen, (255, 0, 0), ship.rect, 1)  # Draw ship's hitbox in red
-    pygame.draw.rect(screen, (0, 255, 0), landing_pad.rect, 1)
+    #pygame.draw.rect(screen, (255, 0, 0), ship.rect, 1)
+    
     screen.blit(text_surface, (800, 100))
 
     pygame.display.flip()
