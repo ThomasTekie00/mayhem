@@ -1,13 +1,10 @@
-from gameobject import gameobject
-from config import config
-
-vector = pygame.math.Vector2
-
+import gameobject
+import config
 import pygame
 import math
 import random
 
-
+vector = pygame.math.Vector2
 
 
 
@@ -25,7 +22,8 @@ class Blueprint(pygame.sprite.Sprite):
 
         self.direction = vector(0,-1)
         self.angle = 0
-        self.thrust = 0.8
+        self.thrust = config.thrust
+        self.friction = config.friction
       
 
         """
@@ -35,22 +33,16 @@ class Blueprint(pygame.sprite.Sprite):
         - Current health variable
         - Health ratio
         """
-        self.current_health = 1000
-        self.max_health = 1000
-        self.health_bar_length = 200
-        self.health_ratio = self.max_health / self.health_bar_length
+        self.current_health = config.current_health
+        self.max_health = config.max_health
+        self.health_bar_length = config.health_bar_length
+        self.health_ratio = config.health_ratio
 
-        """
-        Fuel system
-        - Function for fuel
-        - Max fuel variable
-        - Current fuel variable
-        - fuel ratio
-        """
-        self.current_fuel = 1000
-        self.max_fuel = 1000
-        self.fuel_bar_length = 200
-        self.fuel_ratio = self.max_fuel / self.fuel_bar_length
+        #Fuel system: 
+        self.current_fuel = config.current_fuel
+        self.max_fuel = config.max_fuel
+        self.fuel_bar_length = config.fuel_bar_length
+        self.fuel_ratio = config.fuel_ratio
 
         """
         Method for player speed in the direction they are facing:
@@ -64,9 +56,14 @@ class Blueprint(pygame.sprite.Sprite):
         self.vel += self.direction * self.thrust
 
     def update(self):
+        #Updates the pos based on the travel
         self.pos += self.vel
 
 
+    def space_update(self):
+        self.vel += config.gravity
+
+        self.vel *= config.friction
 
 
 
