@@ -34,6 +34,8 @@ background_color = background.get_at((SCREEN_X // 2, 1000))
 
 
 
+
+
 # Skip-klasser med thrust og rotasjon
 class Ship:
     def __init__(self, image_path, position):
@@ -79,7 +81,7 @@ class Ship:
 
     def fire(self) :
         rad = math.radians(self.angle)
-        bullet_speed = 10
+        bullet_speed = 5
         velocity = pygame.math.Vector2(math.cos(rad), -math.sin(rad)) * bullet_speed
         bullet_pos = pygame.math.Vector2(self.rect.center)
         return {
@@ -91,6 +93,40 @@ class Ship:
         # Dette fungerer fortsatt ikke i en egen class. Er nesten bedre å srkive en egen class for fire tror jeg.
         # Dette fungerer hvis man skriver egne funksjoner i hovedløkken. Så det er ganske klønete.
         # Vet enda ikke helt hvordan jeg skal få fikset det.  
+
+
+class Shoot(Ship):
+    def __init__(self, start_pos, angle):
+        
+        super().__init__(image_path="", position=start_pos)
+        
+        self.position = pygame.math.Vector2(start_pos)
+        self.angle = angle
+        self.speed = 10
+        self.radius = 3
+        self.color = (255, 0, 0) 
+        
+        # Beregn retningen basert på vinkelen
+        direction = pygame.math.Vector2(
+            math.cos(math.radians(angle)),
+            -math.sin(math.radians(angle))
+        )
+        self.velocity = direction * self.speed
+
+    def update(self):
+        self.position += self.velocity
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, self.color, (int(self.position.x), int(self.position.y)), self.radius)
+
+
+    # Skuddene blir borte når de går utenfor kanten
+    def is_off_screen(self):
+        return (
+            self.position.x < 0 or self.position.x > SCREEN_X or
+            self.position.y < 0 or self.position.y > SCREEN_Y
+        )
+
 
 # Skip-instansene
 player1 = Ship(p1_img, (400, 700))
