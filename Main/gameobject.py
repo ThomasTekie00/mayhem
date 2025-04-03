@@ -81,7 +81,7 @@ class RockShower(pygame.sprite.Sprite):
     
 
 
-class Bullet(pygame.sprite.Sprite)
+class Bullet(pygame.sprite.Sprite):
     def __init__(self):
         pass
 

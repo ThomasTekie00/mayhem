@@ -52,7 +52,7 @@ skip1 = pygame.transform.flip(skip1, True, False)
 #skip2_speed = 5
 
 
-
+gravity = vector(0,0.1)
 
     
 
@@ -148,7 +148,7 @@ class Starship(pygame.sprite.Sprite):
         self.vel *= 0.85
 
         #Konstant nedtrekk på y aksen
-        self.vel += vector(0,0.1)
+        self.vel += gravity
 
         # Oppdater posisjon
         self.pos += self.vel
