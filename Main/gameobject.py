@@ -1,5 +1,7 @@
 import pygame
 import random
+import math
+import config
 
 vector = pygame.math.Vector2
 
@@ -26,7 +28,7 @@ class PickUps(pygame.sprite.Sprite):
 
 class Fuel(PickUps):
     def __init__(self, image, pos, fuel_amount = 200):
-        super().__init__()
+        super().__init__(image, pos)
         self.fuel_amount = fuel_amount
     
     def picked(self, ship):
@@ -37,7 +39,7 @@ class Fuel(PickUps):
 
 class Health(PickUps):
     def __init__(self, image, pos, health_amount = 100):
-        super().__init__()
+        super().__init__(image,pos)
         self.health_amount = health_amount
     
     def picked(self, ship):
@@ -82,11 +84,27 @@ class RockShower(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self):
-        pass
+    def __init__(self, pos, angle):
+        super().__init__()
+        self.original_image = pygame.Surface((10,5))
+        self.original_image.fill("White")
+        self.image = self.original_image.copy()
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = vector(pos)
+        self.angle = angle
+        self.speed = 10
+        
+        self.direction = vector(-math.sin(math.radians(self.angle)), -math.cos(math.radians(self.angle)))
 
-    #Movement
-    #Killself
-    #Fart
-    #
+    def update(self):
+        self.pos += self.direction * self.speed
+        
+
+        self.rect.center = (round(self.pos.x), round(self.pos.y))
+
+        
+        
+        
+
+        
 
