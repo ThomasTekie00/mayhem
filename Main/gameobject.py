@@ -14,6 +14,8 @@ class PickUps(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.pos = vector(pos)
 
+        
+
     def update(self):
         self.rect.center = self.pos
 

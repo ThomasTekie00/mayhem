@@ -18,7 +18,9 @@ fuel_img = "bilder/fuel.png"
 font_img = "bilder/font.otf"
 bullet_img = "bilder/bullet.png"
 
-font = pygame.font.Font(font_img, 20)
+font_score = pygame.font.Font(font_img, 20)
+font_result = pygame.font.Font(font_img, 50)
+font_restart = pygame.font.Font(font_img, 30)
 
 
 
@@ -27,6 +29,7 @@ font = pygame.font.Font(font_img, 20)
 SCREEN_X = 1000
 SCREEN_Y = 600
 FPS = 60
+
 
 
 #Screen display:
@@ -77,7 +80,7 @@ fuel_ratio = max_fuel / fuel_bar_length
 
 
 #Ship physics
-thrust = 1.2
+thrust = 0.9
 friction = 0.85
-gravity = vector(0,0.3)
+gravity = vector(0,0.2)
 
