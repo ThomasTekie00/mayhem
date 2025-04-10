@@ -11,7 +11,6 @@ vector = pygame.math.Vector2
 
 pygame.init()
 
-
 bullets_group = pygame.sprite.Group()
 bullets_group_2 = pygame.sprite.Group()
 
