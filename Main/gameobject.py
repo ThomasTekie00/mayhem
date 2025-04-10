@@ -88,7 +88,7 @@ class RockShower(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, angle):
         super().__init__()
-        self.original_image = pygame.Surface((10,5))
+        self.original_image = pygame.Surface((5,5))
         self.original_image.fill("White")
         self.image = self.original_image.copy()
         self.rect = self.image.get_rect(center=pos)

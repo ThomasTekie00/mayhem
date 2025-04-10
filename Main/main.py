@@ -10,6 +10,7 @@ from starships import bullets_group
 from starships import bullets_group_2
 import random
 import time
+import cProfile
 
 vector = pygame.math.Vector2
 
@@ -255,7 +256,7 @@ def loop():
 
         
         
-        if player1 >= 3:
+        if player1 >= 15:
             if show_game_over(1):
                 player1_score = 0
                 player2_score = 0
@@ -313,4 +314,5 @@ def loop():
 
 if __name__ == "__main__":
     loop()
+    cProfile.run('loop()')
     pygame.quit()
