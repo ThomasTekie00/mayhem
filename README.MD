@@ -21,6 +21,7 @@ otherwise its game-over.
 - D - Turn right
 - SPACE - Shoot
 
+
 ### Player 2:
 - Up ARROW: Thrust
 - Left ARROW: Turn left
