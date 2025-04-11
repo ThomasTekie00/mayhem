@@ -66,7 +66,8 @@ bullet = pygame.image.load(bullet_img)
 bullet = pygame.transform.scale(bullet, (30,30))
 bullet = bullet.convert()
 
-
+#Gameover
+win_points = 10
 
 
 

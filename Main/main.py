@@ -16,6 +16,7 @@ vector = pygame.math.Vector2
 
 
 pygame.init()
+
 #run = True
 font = pygame.font.Font("bilder/font.otf", 50)
 clock = pygame.time.Clock()
@@ -114,45 +115,42 @@ def loop():
                 run = False
 
 
-
+####################################Bullet collision#############################################################################
         ################Bullets from player 1 collide with rock##################
         shots = pygame.sprite.groupcollide(bullets_group, rock_group, True, True)
         if shots:
-            for bullet, rocks in shots.items():
-                for rock in rocks:
-                    if ship:
-                        player1_score += 1
-                    
-                
-                    new_rock = RockShower(config.rock)
-                    all_sprites.add(new_rock) 
-                    rock_group.add(new_rock)
+            player1_score += 1
+
+            new_rock = RockShower(config.rock)
+            all_sprites.add(new_rock) 
+            rock_group.add(new_rock)
+            
 
 
         ################Bullets from player 2 collide with rock##################
         shots = pygame.sprite.groupcollide(bullets_group_2, rock_group, True, True)
         if shots:
-            for bullet, rocks in shots.items():
-                for rock in rocks:
-                    if ship2:
-                        player2_score += 1
-                    
-                
-            
-                    new_rock = RockShower(config.rock)
-                    all_sprites.add(new_rock) 
-                    rock_group.add(new_rock)
-
-        hits_1 = pygame.sprite.spritecollide(ship2, bullets_group, True)
-        if hits_1:
-            ship2.current_health -= 100
-            player1_score += 1
-        
-        hits_2 = pygame.sprite.spritecollide(ship2, bullets_group, True)
-        if hits_2:
-            ship.current_health -= 100
             player2_score += 1
 
+
+            new_rock = RockShower(config.rock)
+            all_sprites.add(new_rock) 
+            rock_group.add(new_rock)
+        
+                    
+        
+        #Bullets hitting ship 2
+        hits_1 = pygame.sprite.spritecollide(ship2, bullets_group, True)
+        if hits_1:
+            ship2.current_health -= 350
+            player1_score += 1
+        #Bullets hitting ship 1
+        hits_2 = pygame.sprite.spritecollide(ship, bullets_group_2, True)
+        if hits_2:
+            ship.current_health -= 350
+            player2_score += 1
+
+#############################Pickups collisjons########################################################################################
 
         ################Player 1 pickups fuel can########################
         fuel_collide = pygame.sprite.spritecollide(ship, fuel_group, True)
@@ -187,7 +185,7 @@ def loop():
 
         ################Player 2 pickups health pack######################
         heal_collide = pygame.sprite.spritecollide(ship2, heal_group, True)
-        if fuel_collide:
+        if heal_collide:
             ship2.get_health(200)
 
             new_heal_pos = (random.randint(100, config.SCREEN_X - 100), random.randint(100, config.SCREEN_Y - 100))
@@ -196,12 +194,11 @@ def loop():
             all_sprites.add(new_heal)
 
 
-        ###################################################################
+######################################################################################################################################
         
-
-
+##Player gameplay logic
       
-
+        #Respawning when the players lose their health
         if ship.current_health <= 0:
             player2_score += 1
             new_pos = (random.randint(50, config.SCREEN_X - 50), random.randint(50, config.SCREEN_Y - 50))
@@ -210,20 +207,21 @@ def loop():
             ship.current_health = config.current_health
             ship.current_fuel = config.current_fuel
             
-
+        
         if ship2.current_health <= 0:
             player1_score += 1
             new_pos = (random.randint(50, config.SCREEN_X - 50), random.randint(50, config.SCREEN_Y - 50))
-            ship.pos = new_pos
-            ship.vel = vector(0,0)
+            ship2.pos = new_pos
+            ship2.vel = vector(0,0)
             ship2.current_health = config.current_health
             ship2.current_fuel = config.current_fuel
 
 
+        #Collisjon between rock and player 1 + spawns in a new rock
         crash = pygame.sprite.spritecollide(ship, rock_group, False)
         if crash:
             for rock in crash:
-                ship.lose_health(10)
+                ship.lose_health(100)
                 player1_score -= 1
                 rock.kill()
             
@@ -232,11 +230,11 @@ def loop():
                 rock_group.add(new_rock)
 
        
-         
+        #Collisjon between rock and player2 + Spawns in a new rock 
         crash = pygame.sprite.spritecollide(ship2, rock_group, False)
         if crash:
             for rock in crash:
-                ship2.lose_health(5)
+                ship2.lose_health(100)
                 player2_score -= 1
                 rock.kill()
 
@@ -246,41 +244,103 @@ def loop():
                 rock_group.add(new_rock)
         
         
+        #Collisjon between the two ships
         if pygame.sprite.collide_rect(ship, ship2) or pygame.sprite.collide_rect(ship2, ship):
-            ship.lose_health(10)
-            ship2.lose_health(10)
+            ship.lose_health(200)
+            ship2.lose_health(200)
         
 
-        player1 = player1_score
-        player2 = player2_score
 
-        
-        
-        if player1 >= 15:
+        #Scoring enough points to win and redraw screen with show_game_over
+        if player1_score >= config.win_points:
             if show_game_over(1):
-                player1_score = 0
+                player1_score= 0
                 player2_score = 0
-                new_pos = (random.randint(50, config.SCREEN_X - 50), random.randint(50, config.SCREEN_Y - 50))
+                new_pos_1 = ((200, config.SCREEN_Y / 2))
+                new_pos_2 = ((850, config.SCREEN_Y / 2))
+
+                #rock.kill()
+                #bullet.kill()
+
                 ship.vel = (0,0)
-                ship.pos = new_pos
+                ship.pos = new_pos_1
                 ship.current_health = config.current_health
                 ship.current_fuel = config.current_fuel
-            else:
-                run = False
-        
-        if player2 >= 3:
-            if show_game_over(2):
-                player1_score = 0
-                player2_score = 0
-                new_pos_2 = (random.randint(50, config.SCREEN_X + 50), random.randint(50, config.SCREEN_Y - 50))
+
                 ship2.vel = (0,0)
                 ship2.pos = new_pos_2
                 ship2.current_health = config.current_health
                 ship2.current_fuel = config.current_fuel
+            else:
+                run = False
+        
+        if player2_score >= config.win_points:
+            if show_game_over(2):
+                player1_score = 0
+                player2_score = 0
+                new_pos_1 = ((200, config.SCREEN_Y / 2))
+                new_pos_2 = ((850, config.SCREEN_Y / 2))
+
+
+                ship2.vel = (0,0)
+                ship2.pos = new_pos_2
+                ship2.current_health = config.current_health
+                ship2.current_fuel = config.current_fuel
+
+        
+                ship.vel = (0,0)
+                ship.pos = new_pos_1
+                ship.current_fuel = config.current_fuel
+                ship.current_health = config.current_health
                 
             else:
                 run = False
+
+        if ship.current_fuel == 0:
+            if show_game_over(2):
+                player1_score = 0
+                player2_score = 0
+                new_pos_1 = ((200, config.SCREEN_Y / 2))
+                new_pos_2 = ((850, config.SCREEN_Y / 2))
+
+                ship2.vel = (0,0)
+                ship2.pos = new_pos_2
+                ship2.current_health = config.current_health
+                ship2.current_fuel = config.current_fuel
+
+                
+                ship.vel = (0,0)
+                ship.pos = new_pos_1
+                ship.current_fuel = config.current_fuel
+                ship.current_health = config.current_health
+            else:
+                run = False
+
             
+        if ship2.current_fuel == 0:
+            if show_game_over(1):
+                player1_score = 0
+                player2_score = 0
+                new_pos_1 = ((200, config.SCREEN_Y / 2))
+                new_pos_2 = ((850, config.SCREEN_Y / 2))
+
+                ship.vel = (0,0)
+                ship.pos = new_pos_1
+                ship.current_health = config.current_health
+                ship.current_fuel = config.current_fuel
+
+                ship2.vel = (0,0)
+                ship2.pos = new_pos_2
+                ship2.current_health = config.current_health
+                ship2.current_fuel = config.current_fuel
+            else:
+                run = False
+        
+########################################################################################################################################
+
+
+
+
         all_sprites.update()
         bullets_group.update()
         bullets_group_2.update()
@@ -314,5 +374,4 @@ def loop():
 
 if __name__ == "__main__":
     loop()
-    cProfile.run('loop()')
     pygame.quit()
