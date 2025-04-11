@@ -18,5 +18,7 @@ shoot down their opponent while managing fuel and avoiding obstacles.
    - Right Shift: Fire
 
 
-###To do:
-[]
+#Objective:
+Score points by shooting down your opponent or shooting down the rocks
+
+
